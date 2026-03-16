@@ -95,6 +95,8 @@ export default function App() {
     return saved ? JSON.parse(saved) : []
   })
   const [expanded, setExpanded] = useState(() => new Set())
+  const [editingId, setEditingId] = useState(null)
+  const formRef = useRef(null)
 
   const isCardio = workoutType === 'Cardio'
 
@@ -133,10 +135,35 @@ export default function App() {
     e.preventDefault()
     const valid = exercises.filter(e => e.name.trim())
     if (valid.length === 0) return
-    const newSession = { id: Date.now(), date, type: workoutType, exercises: valid }
-    setSessions(prev => [newSession, ...prev])
-    setExpanded(prev => new Set([...prev, newSession.id]))
+    if (editingId) {
+      setSessions(prev => prev.map(s => s.id === editingId ? { id: editingId, date, type: workoutType, exercises: valid } : s))
+      setEditingId(null)
+    } else {
+      const newSession = { id: Date.now(), date, type: workoutType, exercises: valid }
+      setSessions(prev => [newSession, ...prev])
+      setExpanded(prev => new Set([...prev, newSession.id]))
+    }
     setExercises([emptyExercise(isCardio)])
+  }
+
+  function startEdit(session) {
+    setDate(session.date)
+    setWorkoutType(session.type)
+    setExercises(session.exercises.map(e => ({ ...e, id: Date.now() + Math.random() })))
+    setEditingId(session.id)
+    formRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setDate(today())
+    setWorkoutType(WORKOUT_TYPES[0])
+    setExercises([emptyExercise(false)])
+  }
+
+  function deleteSession(id) {
+    if (!window.confirm('Delete this workout?')) return
+    setSessions(prev => prev.filter(s => s.id !== id))
   }
 
   function toggleExpanded(id) {
@@ -170,7 +197,7 @@ export default function App() {
     <div className="app">
       <h1>Workout Logger</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div className="card">
           <div className="session-header">
             <div className="form-group">
@@ -250,7 +277,10 @@ export default function App() {
           <button type="button" className="add-exercise-btn" onClick={addExercise}>+ Add {isCardio ? 'Activity' : 'Exercise'}</button>
         </div>
 
-        <button type="submit" className="save-btn">Save Workout</button>
+        <div className="form-actions">
+          <button type="submit" className="save-btn">{editingId ? 'Update Workout' : 'Save Workout'}</button>
+          {editingId && <button type="button" className="cancel-btn" onClick={cancelEdit}>Cancel</button>}
+        </div>
       </form>
 
       <div className="card">
@@ -263,14 +293,20 @@ export default function App() {
             const sessionIsCardio = session.type === 'Cardio'
             return (
               <div key={session.id} className="session-item">
-                <button type="button" className="session-toggle" onClick={() => toggleExpanded(session.id)}>
-                  <div className="session-meta">
-                    <span className="session-date">{session.date}</span>
-                    <span className="session-type-badge">{session.type}</span>
-                    <span className="session-count">{session.exercises.length} exercise{session.exercises.length !== 1 ? 's' : ''}</span>
+                <div className="session-row">
+                  <button type="button" className="session-toggle" onClick={() => toggleExpanded(session.id)}>
+                    <div className="session-meta">
+                      <span className="session-date">{session.date}</span>
+                      <span className="session-type-badge">{session.type}</span>
+                      <span className="session-count">{session.exercises.length} exercise{session.exercises.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span className="toggle-icon">{isOpen ? '▲' : '▼'}</span>
+                  </button>
+                  <div className="session-actions">
+                    <button type="button" className="action-btn edit-btn" onClick={() => startEdit(session)}>✏</button>
+                    <button type="button" className="action-btn delete-btn" onClick={() => deleteSession(session.id)}>🗑</button>
                   </div>
-                  <span className="toggle-icon">{isOpen ? '▲' : '▼'}</span>
-                </button>
+                </div>
 
                 {isOpen && (
                   <table className="history-table">
