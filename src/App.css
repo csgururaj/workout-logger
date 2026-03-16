@@ -286,8 +286,9 @@ input:focus, select:focus {
   border-bottom: none;
 }
 
-.col-name { width: 38%; font-weight: 500; }
-.col-sr   { width: 13%; text-align: center; color: #555; }
-.col-kg   { width: 10%; text-align: center; color: #555; }
-.col-feel { width: 18%; text-align: center; }
-.col-delta{ width: 21%; text-align: right; }
+.col-name     { width: 38%; font-weight: 500; }
+.col-sr       { width: 13%; text-align: center; color: #555; }
+.col-kg       { width: 10%; text-align: center; color: #555; }
+.col-feel     { width: 18%; text-align: center; }
+.col-delta    { width: 21%; text-align: right; }
+.col-comments { width: 39%; color: #777; font-size: 0.78rem; }
