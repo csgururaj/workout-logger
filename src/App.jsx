@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import './App.css'
 
 const WORKOUT_TYPES = [
@@ -100,7 +102,7 @@ function toDisplay(iso) {
 
 export default function App() {
   const [date, setDate] = useState(today())
-  const [dateInput, setDateInput] = useState(() => toDisplay(today()))
+  const [selectedDate, setSelectedDate] = useState(new Date())
   const [workoutType, setWorkoutType] = useState(WORKOUT_TYPES[0])
   const [exercises, setExercises] = useState([emptyExercise(false)])
   const [sessions, setSessions] = useState(() => {
@@ -161,7 +163,7 @@ export default function App() {
 
   function startEdit(session) {
     setDate(session.date)
-    setDateInput(toDisplay(session.date))
+    setSelectedDate(new Date(session.date + 'T00:00:00'))
     setWorkoutType(session.type)
     setExercises(session.exercises.map(e => ({ ...e, id: Date.now() + Math.random() })))
     setEditingId(session.id)
@@ -171,7 +173,7 @@ export default function App() {
   function cancelEdit() {
     setEditingId(null)
     setDate(today())
-    setDateInput(toDisplay(today()))
+    setSelectedDate(new Date())
     setWorkoutType(WORKOUT_TYPES[0])
     setExercises([emptyExercise(false)])
   }
@@ -216,22 +218,15 @@ export default function App() {
         <div className="card">
           <div className="session-header">
             <div className="form-group">
-              <label>Date (DD/MM/YY)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                placeholder="DD/MM/YY"
-                value={dateInput}
-                onChange={e => {
-                  let val = e.target.value.replace(/[^\d/]/g, '')
-                  // auto-insert slashes
-                  if (val.length === 2 && dateInput.length === 1) val += '/'
-                  if (val.length === 5 && dateInput.length === 4) val += '/'
-                  setDateInput(val)
-                  const iso = toISO(val)
-                  if (iso) setDate(iso)
+              <label>Date</label>
+              <DatePicker
+                selected={selectedDate}
+                onChange={d => {
+                  setSelectedDate(d)
+                  setDate(d.toISOString().split('T')[0])
                 }}
-                maxLength={8}
+                dateFormat="dd/MM/yy"
+                className="date-picker-input"
               />
             </div>
             <div className="form-group">

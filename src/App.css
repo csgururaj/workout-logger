@@ -245,6 +245,51 @@ input:focus, select:focus {
 .diff-label.diff-ok         { background: #fff8e6; color: #c47f00; }
 .diff-label.diff-difficult  { background: #fde8e8; color: #c02020; }
 
+/* Date picker */
+.date-picker-input {
+  padding: 9px 11px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fafafa;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  color: #1a1a1a;
+}
+
+.date-picker-input:focus { border-color: #4f6ef7; background: white; }
+
+.react-datepicker-wrapper { width: 100%; }
+
+.react-datepicker {
+  font-family: -apple-system, sans-serif;
+  border: 1.5px solid #e0e4ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.react-datepicker__header {
+  background: #4f6ef7;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name { color: white; }
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: #4f6ef7;
+  border-radius: 50%;
+}
+
+.react-datepicker__day:hover { border-radius: 50%; }
+
+.react-datepicker__navigation-icon::before { border-color: white; }
+
 /* Autocomplete */
 .autocomplete-wrap {
   position: relative;
