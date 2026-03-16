@@ -444,3 +444,30 @@ input:focus, select:focus {
 .col-feel     { width: 18%; text-align: center; }
 .col-delta    { width: 21%; text-align: right; }
 .col-comments { width: 39%; color: #777; font-size: 0.78rem; }
+
+/* Data section */
+.data-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.data-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  display: block;
+}
+
+.export-btn { background: #eef1fd; color: #4f6ef7; }
+.import-btn { background: #e6f9f0; color: #1d9e5e; }
+
+.data-note {
+  font-size: 0.75rem;
+  color: #aaa;
+}

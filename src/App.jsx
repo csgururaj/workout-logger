@@ -183,6 +183,43 @@ export default function App() {
     setSessions(prev => prev.filter(s => s.id !== id))
   }
 
+  function exportData() {
+    const json = JSON.stringify(sessions, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `workouts-${today()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function importData(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      try {
+        const imported = JSON.parse(ev.target.result)
+        if (!Array.isArray(imported)) throw new Error('Invalid format')
+        const merged = [...sessions]
+        let added = 0
+        for (const s of imported) {
+          if (!merged.find(x => x.id === s.id)) {
+            merged.push(s)
+            added++
+          }
+        }
+        setSessions(merged)
+        alert(`Imported ${added} new session${added !== 1 ? 's' : ''}.`)
+      } catch {
+        alert('Invalid file. Please select a valid workout export.')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   function toggleExpanded(id) {
     setExpanded(prev => {
       const next = new Set(prev)
@@ -387,6 +424,21 @@ export default function App() {
             )
           })
         )}
+      </div>
+
+      {/* Data */}
+      <div className="card">
+        <h2>Data</h2>
+        <div className="data-actions">
+          <button type="button" className="data-btn export-btn" onClick={exportData}>
+            ↓ Export JSON
+          </button>
+          <label className="data-btn import-btn">
+            ↑ Import JSON
+            <input type="file" accept=".json" onChange={importData} style={{ display: 'none' }} />
+          </label>
+        </div>
+        <p className="data-note">{sessions.length} session{sessions.length !== 1 ? 's' : ''} stored · Import merges without duplicates</p>
       </div>
     </div>
   )
