@@ -22,6 +22,10 @@ export default function App() {
     return saved ? JSON.parse(saved) : []
   })
 
+  const pastExerciseNames = [...new Set(
+    sessions.flatMap(s => s.exercises.map(e => e.name.trim())).filter(Boolean)
+  )]
+
   useEffect(() => {
     localStorage.setItem('sessions', JSON.stringify(sessions))
   }, [sessions])
@@ -73,6 +77,10 @@ export default function App() {
     <div className="app">
       <h1>Workout Logger</h1>
 
+      <datalist id="exercise-names">
+        {pastExerciseNames.map(name => <option key={name} value={name} />)}
+      </datalist>
+
       <form onSubmit={handleSubmit}>
         {/* Session Header */}
         <div className="card">
@@ -99,6 +107,7 @@ export default function App() {
               <div className="exercise-fields">
                 <div className="form-group">
                   <input
+                    list="exercise-names"
                     placeholder="Exercise name"
                     value={ex.name}
                     onChange={e => updateExercise(ex.id, 'name', e.target.value)}

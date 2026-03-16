@@ -38,11 +38,8 @@ h2 {
 /* Session header */
 .session-header {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-}
-
-.session-header .form-group {
-  flex: 1;
 }
 
 .form-group {
