@@ -86,8 +86,21 @@ function ExerciseNameInput({ value, onChange, suggestions, placeholder }) {
   )
 }
 
+function toISO(ddmmyy) {
+  const [d, m, y] = ddmmyy.split('/')
+  if (!d || !m || !y) return null
+  return `20${y.padStart(2,'0')}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`
+}
+
+function toDisplay(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}/${m}/${y.slice(2)}`
+}
+
 export default function App() {
   const [date, setDate] = useState(today())
+  const [dateInput, setDateInput] = useState(() => toDisplay(today()))
   const [workoutType, setWorkoutType] = useState(WORKOUT_TYPES[0])
   const [exercises, setExercises] = useState([emptyExercise(false)])
   const [sessions, setSessions] = useState(() => {
@@ -148,6 +161,7 @@ export default function App() {
 
   function startEdit(session) {
     setDate(session.date)
+    setDateInput(toDisplay(session.date))
     setWorkoutType(session.type)
     setExercises(session.exercises.map(e => ({ ...e, id: Date.now() + Math.random() })))
     setEditingId(session.id)
@@ -157,6 +171,7 @@ export default function App() {
   function cancelEdit() {
     setEditingId(null)
     setDate(today())
+    setDateInput(toDisplay(today()))
     setWorkoutType(WORKOUT_TYPES[0])
     setExercises([emptyExercise(false)])
   }
@@ -201,8 +216,23 @@ export default function App() {
         <div className="card">
           <div className="session-header">
             <div className="form-group">
-              <label>Date</label>
-              <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+              <label>Date (DD/MM/YY)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="DD/MM/YY"
+                value={dateInput}
+                onChange={e => {
+                  let val = e.target.value.replace(/[^\d/]/g, '')
+                  // auto-insert slashes
+                  if (val.length === 2 && dateInput.length === 1) val += '/'
+                  if (val.length === 5 && dateInput.length === 4) val += '/'
+                  setDateInput(val)
+                  const iso = toISO(val)
+                  if (iso) setDate(iso)
+                }}
+                maxLength={8}
+              />
             </div>
             <div className="form-group">
               <label>Workout Type</label>
@@ -296,7 +326,7 @@ export default function App() {
                 <div className="session-row">
                   <button type="button" className="session-toggle" onClick={() => toggleExpanded(session.id)}>
                     <div className="session-meta">
-                      <span className="session-date">{session.date}</span>
+                      <span className="session-date">{toDisplay(session.date)}</span>
                       <span className="session-type-badge">{session.type}</span>
                       <span className="session-count">{session.exercises.length} exercise{session.exercises.length !== 1 ? 's' : ''}</span>
                     </div>
