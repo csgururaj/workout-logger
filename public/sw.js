@@ -1,4 +1,4 @@
-const CACHE = 'workout-v1'
+const CACHE = 'workout-' + self.registration.scope
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['/', '/manifest.json'])))
@@ -17,12 +17,14 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(e.request)
-      const networkFetch = fetch(e.request).then(res => {
+      // Network first — always try to get fresh assets, fall back to cache offline
+      try {
+        const res = await fetch(e.request)
         if (res.ok) cache.put(e.request, res.clone())
         return res
-      }).catch(() => cached)
-      return cached || networkFetch
+      } catch {
+        return await cache.match(e.request)
+      }
     })
   )
 })
